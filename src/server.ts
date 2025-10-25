@@ -3,6 +3,7 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { config } from "./config/app.config";
+import appRoute from "./routes/index";
 
 const app = express();
 
@@ -22,6 +23,7 @@ if (config.NODE_ENV !== "test") {
 
 (async () => {
   try {
+    app.use("/", appRoute);
 
     app.use((req: Request, res: Response) => {
       res.status(404).json({
