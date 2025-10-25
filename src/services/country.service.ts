@@ -87,7 +87,7 @@ class CountryService {
     sort?: string;
   }) {
     const where: any = {};
-    
+
     if (filters.region) {
       where.region = filters.region;
     }
@@ -99,6 +99,12 @@ class CountryService {
     let orderBy: any = {};
     if (filters.sort === "gdp_desc") {
       orderBy = { estimated_gdp: "desc" };
+    } else if (filters.sort === "gdp_asc") {
+      orderBy = { estimated_gdp: "asc" };
+    } else if (filters.sort === "population_desc") {
+      orderBy = { population: "desc" };
+    } else if (filters.sort === "population_asc") {
+      orderBy = { population: "asc" };
     }
 
     return prisma.country.findMany({
@@ -113,13 +119,13 @@ class CountryService {
       WHERE LOWER(name) = LOWER(${name})
       LIMIT 1
     `;
-    
+
     return countries.length > 0 ? countries[0] : null;
   }
 
   async deleteCountry(name: string) {
     const country = await this.getCountryByName(name);
-    
+
     if (!country) {
       return null;
     }

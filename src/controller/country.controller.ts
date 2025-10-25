@@ -135,11 +135,11 @@ class CountryController {
 
   async getImage(req: Request, res: Response): Promise<void> {
     try {
-      const imagePath = path.join(process.cwd(), "cache", "summary.svg");
+      const imagePath = path.join(process.cwd(), "cache", "summary.png");
 
       try {
         await fs.access(imagePath);
-        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("Content-Type", "image/png");
         res.sendFile(imagePath);
       } catch {
         res.status(404).json({
