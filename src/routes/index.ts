@@ -1,5 +1,6 @@
 import { Router } from "express";
 import countryRoutes from "../routes/country";
+import CountryController from "../controller/country.controller";
 
 const router = Router();
 
@@ -11,6 +12,8 @@ router.get("/", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+router.get("/status", CountryController.getStatus); 
 
 router.use("/countries", countryRoutes);
 

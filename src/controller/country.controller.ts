@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import  CountryService from "../services/country.service";
+import CountryService from "../services/country.service";
 import path from "path";
 import fs from "fs/promises";
 
@@ -28,6 +28,22 @@ class CountryController {
     try {
       const { region, currency, sort } = req.query;
 
+      const validSorts = [
+        "gdp_desc",
+        "gdp_asc",
+        "population_desc",
+        "population_asc",
+      ];
+      if (sort && typeof sort === "string" && !validSorts.includes(sort)) {
+        res.status(400).json({
+          error: "Validation failed",
+          details: {
+            sort: `must be one of: ${validSorts.join(", ")}`,
+          },
+        });
+        return;
+      }
+
       const countries = await CountryService.getAllCountries({
         region: region as string,
         currency: currency as string,
@@ -45,6 +61,17 @@ class CountryController {
   async getCountryByName(req: Request, res: Response): Promise<void> {
     try {
       const { name } = req.params;
+
+      if (!name || name.trim() === "") {
+        res.status(400).json({
+          error: "Validation failed",
+          details: {
+            name: "is required",
+          },
+        });
+        return;
+      }
+
       const country = await CountryService.getCountryByName(name);
 
       if (!country) {
@@ -65,6 +92,17 @@ class CountryController {
   async deleteCountry(req: Request, res: Response): Promise<void> {
     try {
       const { name } = req.params;
+
+      if (!name || name.trim() === "") {
+        res.status(400).json({
+          error: "Validation failed",
+          details: {
+            name: "is required",
+          },
+        });
+        return;
+      }
+
       const country = await CountryService.deleteCountry(name);
 
       if (!country) {

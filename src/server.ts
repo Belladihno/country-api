@@ -2,6 +2,8 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import fs from "fs/promises";
+import path from "path";
 import { config } from "./config/app.config";
 import appRoute from "./routes/index";
 
@@ -23,6 +25,10 @@ if (config.NODE_ENV !== "test") {
 
 (async () => {
   try {
+    const cacheDir = path.join(process.cwd(), "cache");
+    await fs.mkdir(cacheDir, { recursive: true });
+    console.log("Cache directory initialized");
+
     app.use("/", appRoute);
 
     app.use((req: Request, res: Response) => {
@@ -41,7 +47,8 @@ if (config.NODE_ENV !== "test") {
     });
 
     app.listen(config.port, () => {
-      console.info(`server is running on http://localhost:${config.port}`);
+      console.info(`Server running on http://localhost:${config.port}`);
+      console.info(`Environment: ${config.NODE_ENV || "development"}`);
     });
   } catch (error) {
     console.error("Failed to start the server", error);
