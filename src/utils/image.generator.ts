@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import prisma from "../prisma/client";
+import sharp from "sharp";
 
 export const generateSummaryImage = async (timestamp: Date): Promise<void> => {
   const totalCountries = await prisma.country.count();
@@ -55,6 +56,9 @@ export const generateSummaryImage = async (timestamp: Date): Promise<void> => {
   const cacheDir = path.join(process.cwd(), "cache");
   await fs.mkdir(cacheDir, { recursive: true });
 
-  const imagePath = path.join(cacheDir, "summary.svg");
-  await fs.writeFile(imagePath, svgContent, "utf-8");
+  const imagePath = path.join(cacheDir, "summary.png");
+  
+  await sharp(Buffer.from(svgContent))
+    .png()
+    .toFile(imagePath);
 };
