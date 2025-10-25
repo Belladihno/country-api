@@ -56,17 +56,28 @@ class CountryService {
           flag_url: country.flag || null,
         };
 
-        await prisma.country.upsert({
-          where: { name: countryData.name },
-          update: {
-            ...countryData,
-            last_refreshed_at: timestamp,
-          },
-          create: {
-            ...countryData,
-            last_refreshed_at: timestamp,
-          },
-        });
+        const existingCountry = await prisma.$queryRaw<any[]>`
+          SELECT id FROM Country 
+          WHERE LOWER(name) = LOWER(${countryData.name})
+          LIMIT 1
+        `;
+
+        if (existingCountry.length > 0) {
+          await prisma.country.update({
+            where: { id: existingCountry[0].id },
+            data: {
+              ...countryData,
+              last_refreshed_at: timestamp,
+            },
+          });
+        } else {
+          await prisma.country.create({
+            data: {
+              ...countryData,
+              last_refreshed_at: timestamp,
+            },
+          });
+        }
       }
 
       await generateSummaryImage(timestamp);
